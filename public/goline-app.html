@@ -1,0 +1,105 @@
+<link rel="import" href="bower_components/note-app/common/note-app/na-elements.html">
+<link rel="import" href="bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
+<link rel="import" href="bower_components/polymerfire/polymerfire.html">
+
+
+<dom-module id="goline-app">
+    <!--Связка модели отображения и модели данных-->
+    <template>
+        <!--Стили-->
+        <style include="goline-app-shared-styles"></style>
+        <!--Тулбар-->
+        <na-toolbar
+            signed-in="[[signedIn]]"
+            on-sign-out="signOut">
+        </na-toolbar>
+        <!--Логин-->
+        <na-login
+            on-sign-in='singIn'
+            signed-in="[[signedIn]]"
+            disabled="[[!online]]">
+        </na-login>
+        <!--Аутинтификация ФБ-->
+        <firebase-auth
+            id="auth"
+            app-name="goline"
+            provider="google"
+            signed-in="{{signedIn}}"
+            user="{{user}}">
+        </firebase-auth>
+        <!--Кнопка[+]-->
+        <paper-fab
+            icon="add"
+            on-tap="create"
+            disabled="[[!online]]"
+            aria-label="Add search answer !">
+        </paper-fab>
+        <!--Редактор-->
+        <na-editor
+            id="editor"
+            note="{{editableNote}}"
+            on-close="commitChange">
+        </na-editor>
+        <!--Документ базы данных-->
+        <firebase-document
+            id="document"
+            app-name="goline"
+            path="[[editableNoteId]]"
+            data="{{editableNote}}">
+        </firebase-document>
+        <!--Запрос к базе данных-->
+        <firebase-query
+            id="query"
+            app-name="goline"
+            query="/notes/[[user.uid]]"
+            data="{{notes}}">
+        </firebase-query>
+        <!--Сохранение данных в offline-->
+        <app-indexeddb-mirror
+            session="[[user.uid]]"
+            key="notes"
+            data="{{notes}}"
+            persisted-data="{{persistedNotes}}">
+        </app-indexeddb-mirror>
+        <!--Вывод списка записей посредствам цикла-->
+        <div class="notes">
+            <template is="dom-repeat" items="[[persistedNotes]]" as="note">
+                <na-note
+                    id$="[[note.$key]]"
+                    title="[[note.title]]"
+                    body="[[note.body]]"
+                    on-tap="edit">
+                </na-note>
+            </template>
+        </div>
+
+    </template>
+
+    <script>
+        // Имплементация логических методов для связки
+        Polymer({
+            // Принадлежность
+            is:'goline-app',
+            // Поведение
+            behaviors: [Polymer.NoteAppBehavior],
+            // Расширенные методы поведения
+            singIn: function() {
+                this.$.auth.signInWithPopup();
+            },
+
+            get notesPath() {
+                return '/notes/' + this.user.uid
+            },
+
+            toEditable: function (noteId) {
+                return this.notesPath + '/' + noteId;
+            },
+
+            get isEditable() {
+                return this.online;
+            }
+        });
+
+    </script>
+
+</dom-module>

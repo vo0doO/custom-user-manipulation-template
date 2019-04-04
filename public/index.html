@@ -1,0 +1,51 @@
+<html>
+<head>
+
+    <!-- Стандартные теги-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <!-- Частныве компоненты -->
+    <title>Just VPN</title>
+    <link  rel="icon"  sizes = "16x16"  href = "favicon.ico">
+    <link rel="manifest" href="./manifest.json">
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="bower_components/web-animations-js/web-animations.min.js"></script>
+    <link rel="import" href="bower_components/platinum-sw/platinum-sw-elements.html">
+    <link rel="import" href="bower_components/polymerfire/firebase-app.html">
+    <link rel="import" href="goline-app.html">
+    <!-- Немного стиля -->
+    <style media="screen">
+        body {
+            margin: 0;
+        }
+    </style>
+
+
+</head>
+<body>
+
+    <!--Сервисный работник-->
+    <platinum-sw-register
+            auto-register
+            clients-claim
+            href="sw-import.js"
+            reload-on-install
+            skip-waiting>
+        <platinum-sw-cache
+            default-cache-strategy="networkFirst">
+        </platinum-sw-cache>
+    </platinum-sw-register>
+
+    <!-- Облачная инфраструктура -->
+    <firebase-app
+        name="goline"
+        api-key="AIzaSyAlV8Lw7Wj2dAH5MCLrSWQk8eAku0DW1AY"
+        auth-domain="our-line.firebaseapp.com"
+        database-url="https://our-line.firebaseio.com">
+    </firebase-app>
+
+    <!-- Главное приложение-->
+    <goline-app></goline-app>
+
+</body>
+</html>
